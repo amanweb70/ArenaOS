@@ -240,3 +240,16 @@ Headless Grid remains the compact reference environment for learning and testing
 
 Production container boundaries and the later AWS deployment shape are documented
 in `DEPLOYMENT.md`.
+
+## Railway container
+
+ArenaOS also ships as one Railway-ready image containing the Next.js experience,
+Fastify control plane, same-origin WebSocket gateway, Python/RDKit worker, and Codex
+CLI:
+
+```text
+ghcr.io/amanweb70/arenaos:latest
+```
+
+The image is built from `Dockerfile.railway` and published by GitHub Actions. See
+`DEPLOYMENT.md` for the `/data` volume, health check, variables, and Railway setup.

@@ -3,6 +3,11 @@ node_modules
 **/.next
 **/dist
 .arena
+.arena-*
 .git
 .env*
 coverage
+*.log
+**/__pycache__
+**/*.pyc
+services/chemcraft-worker/vendor

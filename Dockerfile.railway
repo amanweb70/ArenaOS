@@ -1,0 +1,58 @@
+# syntax=docker/dockerfile:1.7
+
+FROM node:22-bookworm-slim AS build
+
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV ARENA_SERVER_URL=http://127.0.0.1:4000
+
+RUN npm install --global pnpm@10.12.1
+WORKDIR /app
+
+COPY . .
+RUN --mount=type=cache,id=arenaos-pnpm,target=/pnpm/store \
+    pnpm install --frozen-lockfile
+RUN pnpm build:web
+
+FROM caddy:2.10.2 AS caddy
+
+FROM node:22-bookworm-slim AS runtime
+
+LABEL org.opencontainers.image.source="https://github.com/amanweb70/ArenaOS"
+LABEL org.opencontainers.image.description="ArenaOS interactive AI-agent evaluation platform"
+
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV ARENA_STORAGE_DIRECTORY=/data/runs
+ENV CHEMCRAFT_PYTHON=/usr/bin/python3
+ENV PYTHONUNBUFFERED=1
+ENV PORT=8080
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ca-certificates python3 python3-pip supervisor \
+    && rm -rf /var/lib/apt/lists/* \
+    && npm install --global pnpm@10.12.1
+
+WORKDIR /app
+
+COPY services/chemcraft-worker/requirements.txt /tmp/chemcraft-requirements.txt
+RUN --mount=type=cache,id=arenaos-pip,target=/root/.cache/pip \
+    python3 -m pip install --break-system-packages -r /tmp/chemcraft-requirements.txt \
+    && rm /tmp/chemcraft-requirements.txt
+
+COPY --from=caddy /usr/bin/caddy /usr/bin/caddy
+COPY --from=build /app /app
+
+RUN mkdir -p /opt/arena-web/apps/web/public /data/runs \
+    && cp -a /app/apps/web/.next/standalone/. /opt/arena-web/ \
+    && cp -a /app/apps/web/.next/static /opt/arena-web/apps/web/.next/static \
+    && cp -a /app/apps/web/public/. /opt/arena-web/apps/web/public/
+
+COPY docker/railway/Caddyfile /etc/caddy/Caddyfile
+COPY docker/railway/supervisord.conf /etc/supervisor/conf.d/arenaos.conf
+
+EXPOSE 8080
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=45s --retries=3 \
+  CMD node -e "fetch('http://127.0.0.1:' + (process.env.PORT || '8080') + '/api/health').then(r => { if (!r.ok) process.exit(1) }).catch(() => process.exit(1))"
+
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]

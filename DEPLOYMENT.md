@@ -52,3 +52,55 @@ contract.
 | `ARENA_HOST` | Fastify | Listener host; production uses `0.0.0.0` |
 | `ARENA_STORAGE_DIRECTORY` | Fastify | Durable run-record location |
 | `ARENA_DOMAIN` | Caddy | Public hostname |
+
+## Railway single-image deployment
+
+Railway uses the dedicated `Dockerfile.railway` image. This leaves the existing
+development commands and Compose deployment unchanged while packaging the complete
+platform into one Railway service:
+
+```text
+Railway $PORT -> Caddy
+  /api/* and /ws/* -> Fastify :4000
+  everything else -> Next.js :3000
+```
+
+The image also contains Python, RDKit, and the project-local Codex CLI so ChemCraft
+and the environment workshop retain their real server-side capabilities.
+
+Build and test locally:
+
+```bash
+docker build -f Dockerfile.railway -t arenaos:railway .
+docker run --rm -p 8080:8080 -e PORT=8080 \
+  -e ARENA_STORAGE_DIRECTORY=/data/runs \
+  -v arenaos-data:/data arenaos:railway
+```
+
+Open `http://localhost:8080` and verify `http://localhost:8080/api/health`.
+
+### GitHub Container Registry
+
+The `Publish Railway image` workflow publishes these tags from `main`:
+
+```text
+ghcr.io/amanweb70/arenaos:latest
+ghcr.io/amanweb70/arenaos:sha-<commit>
+```
+
+The GHCR package must be public for credential-free Railway pulls. A private GHCR
+package requires Railway registry credentials and an eligible Railway plan.
+
+### Railway service
+
+1. Create a Railway project and choose **Docker Image**.
+2. Enter `ghcr.io/amanweb70/arenaos:latest`.
+3. Add the variables from `railway.env.example`; never define `PORT` yourself.
+4. Attach a Railway Volume at `/data`.
+5. Configure the health-check path as `/api/health`.
+6. Generate a Railway public domain.
+7. Keep the service at one replica while it uses the filesystem run repository.
+
+The `/data` mount persists runs, replay frames, Codex build records, and approved
+generated environments across deployments. Model-provider keys are runtime Railway
+secrets and are never copied into the image.
