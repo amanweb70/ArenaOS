@@ -75,6 +75,52 @@ jobs:
             type=sha,prefix=sha-
             type=ref,event=tag
 
+      - name: Build image for runtime verification
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile.railway
+          platforms: linux/amd64
+          load: true
+          tags: arenaos:smoke
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Smoke-test the complete container
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker run --detach --name arenaos-smoke --publish 18080:8080 arenaos:smoke
+
+          cleanup() {
+            docker logs arenaos-smoke || true
+            docker rm --force arenaos-smoke || true
+          }
+          trap cleanup EXIT
+
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:18080/api/health > /tmp/health.json; then
+              break
+            fi
+
+            if [ "$attempt" -eq 60 ]; then
+              echo "ArenaOS did not become healthy within 120 seconds."
+              exit 1
+            fi
+
+            sleep 2
+          done
+
+          curl --fail --silent http://127.0.0.1:18080/ > /tmp/home.html
+          curl --fail --silent http://127.0.0.1:18080/api/environments > /tmp/environments.json
+          grep --quiet 'royal-chess-v1' /tmp/environments.json
+          grep --quiet 'biocraft-v1' /tmp/environments.json
+          grep --quiet 'chemcraft-v1' /tmp/environments.json
+          grep --quiet 'agent-rumble-v1' /tmp/environments.json
+          grep --quiet 'personacraft-v1' /tmp/environments.json
+          grep --quiet 'physical-ai-mission-lab-v1' /tmp/environments.json
+          docker exec arenaos-smoke python3 -c "from rdkit import rdBase; print(rdBase.rdkitVersion)"
+
       - name: Build and publish image
         uses: docker/build-push-action@v6
         with:
