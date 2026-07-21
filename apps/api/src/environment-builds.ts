@@ -2,7 +2,8 @@ import { spawn, type ChildProcessWithoutNullStreams } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import { EventEmitter } from "node:events";
 import { existsSync } from "node:fs";
-import { cp, mkdir, readFile, readdir, rename, rm, writeFile } from "node:fs/promises";
+import { cp, mkdir, mkdtemp, readFile, readdir, rename, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import { basename, dirname, join, relative, resolve, sep } from "node:path";
 import { createInterface } from "node:readline";
 import { Ajv } from "ajv";
@@ -113,44 +114,51 @@ export class CodexAppServerRunner implements CodexBuildRunner {
     const binary = this.options.binary ?? process.env.CODEX_BINARY ?? "codex";
     const model = this.options.model ?? process.env.OPENAI_CODEX_MODEL ?? "gpt-5.6-sol";
     const launch = resolveCodexLaunch(binary);
-    const child = spawn(launch.command, [...launch.arguments, "app-server"], {
-      cwd: options.workspace,
-      stdio: ["pipe", "pipe", "pipe"],
-      windowsHide: true,
-      env: safeCodexEnvironment(apiKey, options.workspace)
-    });
-    const client = new AppServerClient(child, options.onEvent);
-    const timeout = setTimeout(
-      () => client.abort(new Error("Codex environment build timed out.")),
-      this.options.timeoutMs ?? 12 * 60_000
-    );
-    const onAbort = () => client.interrupt();
-    options.signal.addEventListener("abort", onAbort, { once: true });
+    const authHome = await mkdtemp(join(tmpdir(), "arenaos-codex-auth-"));
+    const childEnvironment = safeCodexEnvironment(apiKey, options.workspace, authHome);
     try {
-      await client.request("initialize", {
-        clientInfo: { name: "arena_os", title: "ArenaOS Environment Builder", version: "0.1.0" }
+      await authenticateCodex(launch, apiKey, childEnvironment);
+      const child = spawn(launch.command, [...launch.arguments, "app-server"], {
+        cwd: options.workspace,
+        stdio: ["pipe", "pipe", "pipe"],
+        windowsHide: true,
+        env: childEnvironment
       });
-      client.notify("initialized", {});
-      const threadResponse = options.threadId
-        ? await client.request("thread/resume", { threadId: options.threadId })
-        : await client.request("thread/start", {
-            model,
-            cwd: options.workspace,
-            approvalPolicy: "never",
-            sandbox: "workspace-write"
-          });
-      const thread = threadResponse.thread as { id?: string } | undefined;
-      const threadId = thread?.id ?? options.threadId;
-      if (!threadId) throw new Error("Codex App Server did not return a thread id.");
-      options.onEvent({ type: "environment_build.codex_started", message: `Codex started with ${model}.`, data: { threadId, model } });
-      await client.startTurn(threadId, options.prompt);
-      return { threadId };
+      const client = new AppServerClient(child, options.onEvent);
+      const timeout = setTimeout(
+        () => client.abort(new Error("Codex environment build timed out.")),
+        this.options.timeoutMs ?? 12 * 60_000
+      );
+      const onAbort = () => client.interrupt();
+      options.signal.addEventListener("abort", onAbort, { once: true });
+      try {
+        await client.request("initialize", {
+          clientInfo: { name: "arena_os", title: "ArenaOS Environment Builder", version: "0.1.0" }
+        });
+        client.notify("initialized", {});
+        const threadResponse = options.threadId
+          ? await client.request("thread/resume", { threadId: options.threadId })
+          : await client.request("thread/start", {
+              model,
+              cwd: options.workspace,
+              approvalPolicy: "never",
+              sandbox: "workspace-write"
+            });
+        const thread = threadResponse.thread as { id?: string } | undefined;
+        const threadId = thread?.id ?? options.threadId;
+        if (!threadId) throw new Error("Codex App Server did not return a thread id.");
+        options.onEvent({ type: "environment_build.codex_started", message: `Codex started with ${model}.`, data: { threadId, model } });
+        await client.startTurn(threadId, options.prompt);
+        return { threadId };
+      } finally {
+        clearTimeout(timeout);
+        options.signal.removeEventListener("abort", onAbort);
+        client.close();
+      }
     } catch (error) {
       throw normalizeCodexLaunchError(error, launch.displayName);
     } finally {
-      clearTimeout(timeout);
-      options.signal.removeEventListener("abort", onAbort);
-      client.close();
+      await rm(authHome, { recursive: true, force: true });
     }
   }
 }
@@ -666,11 +674,12 @@ async function replayDigest(manifest: GeneratedEnvironmentManifest): Promise<unk
   for (const direction of ["east", "south", "east"] as const) states.push((await env.step({ id: direction, type: "move", arguments: { direction } })).state);
   await env.close(); return states;
 }
-function safeCodexEnvironment(apiKey: string, workspace: string): NodeJS.ProcessEnv {
+function safeCodexEnvironment(apiKey: string, workspace: string, authHome: string): NodeJS.ProcessEnv {
   const pick = (name: string) => process.env[name];
-  return { PATH: pick("PATH"), Path: pick("Path"), SystemRoot: pick("SystemRoot"), ComSpec: pick("ComSpec"), TEMP: pick("TEMP"), TMP: pick("TMP"), USERPROFILE: pick("USERPROFILE"), HOME: pick("HOME"), CODEX_HOME: pick("CODEX_HOME"), OPENAI_API_KEY: apiKey, ARENA_GENERATED_WORKSPACE: workspace };
+  return { PATH: pick("PATH"), Path: pick("Path"), SystemRoot: pick("SystemRoot"), ComSpec: pick("ComSpec"), TEMP: pick("TEMP"), TMP: pick("TMP"), USERPROFILE: pick("USERPROFILE"), HOME: pick("HOME"), CODEX_HOME: authHome, OPENAI_API_KEY: apiKey, ARENA_GENERATED_WORKSPACE: workspace };
 }
-function resolveCodexLaunch(binary: string): { command: string; arguments: string[]; displayName: string } {
+type CodexLaunch = { command: string; arguments: string[]; displayName: string };
+function resolveCodexLaunch(binary: string): CodexLaunch {
   const localCli = resolve(process.cwd(), "node_modules", "@openai", "codex", "bin", "codex.js");
   const configured = binary.trim();
   const isGenericCommand = configured.toLowerCase() === "codex" || configured.toLowerCase() === "codex.exe";
@@ -685,6 +694,33 @@ function resolveCodexLaunch(binary: string): { command: string; arguments: strin
     return { command: process.execPath, arguments: [resolve(configured)], displayName: configured };
   }
   return { command: configured, arguments: [], displayName: configured };
+}
+async function authenticateCodex(launch: CodexLaunch, apiKey: string, environment: NodeJS.ProcessEnv): Promise<void> {
+  await new Promise<void>((resolvePromise, rejectPromise) => {
+    const child = spawn(launch.command, [...launch.arguments, "login", "--with-api-key"], {
+      stdio: ["pipe", "ignore", "pipe"],
+      windowsHide: true,
+      env: environment
+    });
+    let stderr = "";
+    const timeout = setTimeout(() => {
+      child.kill();
+      rejectPromise(new Error("Codex API-key authentication timed out."));
+    }, 30_000);
+    child.stderr.on("data", (chunk) => {
+      stderr = `${stderr}${String(chunk)}`.slice(-4_000);
+    });
+    child.on("error", (error) => {
+      clearTimeout(timeout);
+      rejectPromise(error);
+    });
+    child.on("exit", (code) => {
+      clearTimeout(timeout);
+      if (code === 0) resolvePromise();
+      else rejectPromise(new Error(`Codex API-key authentication failed${stderr.trim() ? `: ${stderr.trim()}` : ` with exit code ${code}`}.`));
+    });
+    child.stdin.end(`${apiKey}\n`);
+  });
 }
 function normalizeCodexLaunchError(error: unknown, binary: string): Error {
   if (error instanceof Error && "code" in error && (error as NodeJS.ErrnoException).code === "EPERM") {
