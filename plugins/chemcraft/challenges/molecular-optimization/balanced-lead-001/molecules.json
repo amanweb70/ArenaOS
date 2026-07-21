@@ -1,0 +1,58 @@
+{
+  "lead": {
+    "id": "lead-lidocaine",
+    "name": "Lidocaine reference graph",
+    "smiles": "CCN(CC)C(=O)C1=C(C)C=CC=C1C",
+    "kind": "lead"
+  },
+  "candidates": [
+    {
+      "id": "candidate-dimethyl",
+      "name": "N,N-dimethyl analogue",
+      "smiles": "CN(C)C(=O)C1=C(C)C=CC=C1C",
+      "kind": "candidate"
+    },
+    {
+      "id": "candidate-ethyl-methyl",
+      "name": "N-ethyl-N-methyl analogue",
+      "smiles": "CCN(C)C(=O)C1=C(C)C=CC=C1C",
+      "kind": "candidate"
+    },
+    {
+      "id": "candidate-desmethyl-ring",
+      "name": "Unsubstituted benzamide analogue",
+      "smiles": "CCN(CC)C(=O)C1=CC=CC=C1",
+      "kind": "candidate"
+    },
+    {
+      "id": "candidate-morpholine",
+      "name": "Morpholine amide analogue",
+      "smiles": "O=C(N1CCOCC1)C2=C(C)C=CC=C2C",
+      "kind": "candidate"
+    },
+    {
+      "id": "candidate-pyrrolidine",
+      "name": "Pyrrolidine amide analogue",
+      "smiles": "O=C(N1CCCC1)C2=C(C)C=CC=C2C",
+      "kind": "candidate"
+    },
+    {
+      "id": "candidate-piperidine",
+      "name": "Piperidine amide analogue",
+      "smiles": "O=C(N1CCCCC1)C2=C(C)C=CC=C2C",
+      "kind": "candidate"
+    },
+    {
+      "id": "candidate-secondary-amide",
+      "name": "N-methyl secondary amide analogue",
+      "smiles": "CNC(=O)C1=C(C)C=CC=C1C",
+      "kind": "candidate"
+    },
+    {
+      "id": "candidate-chloro",
+      "name": "Chlorinated analogue",
+      "smiles": "CCN(C)C(=O)C1=C(C)C=C(Cl)C=C1C",
+      "kind": "candidate"
+    }
+  ]
+}

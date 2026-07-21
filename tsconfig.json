@@ -1,0 +1,40 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "jsx": "react-jsx",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      "@arena/contracts": ["packages/contracts/src/index.ts"],
+      "@arena/core": ["packages/core/src/index.ts"],
+      "@arena/plugin-headless-grid": ["plugins/headless-grid/src/index.ts"],
+      "@arena/plugin-scripted-agent": ["plugins/scripted-agent/src/index.ts"],
+      "@arena/plugin-native-evaluators": ["plugins/native-evaluators/src/index.ts"],
+      "@arena/plugin-royal-chess": ["plugins/royal-chess/src/index.ts"],
+      "@arena/plugin-biocraft": ["plugins/biocraft/src/index.ts"],
+      "@arena/plugin-chemcraft": ["plugins/chemcraft/src/index.ts"],
+      "@arena/plugin-agent-rumble": ["plugins/agent-rumble/src/index.ts"],
+      "@arena/plugin-personacraft": ["plugins/personacraft/src/index.ts"],
+      "@arena/plugin-physical-ai": ["plugins/physical-ai/src/index.ts"],
+      "@arena/plugin-openrouter-agent": ["plugins/openrouter-agent/src/index.ts"],
+      "@arena/plugin-generated-environment": ["plugins/generated-environment/src/index.ts"]
+    },
+    "types": ["node", "vitest/globals"]
+  },
+  "include": [
+    "apps/**/*.ts",
+    "apps/**/*.tsx",
+    "packages/**/*.ts",
+    "plugins/**/*.ts",
+    "tests/**/*.ts"
+  ],
+  "exclude": ["apps/web"]
+}

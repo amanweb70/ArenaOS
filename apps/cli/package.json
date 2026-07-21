@@ -1,0 +1,17 @@
+{
+  "name": "@arena/cli",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@arena/contracts": "workspace:*",
+    "@arena/core": "workspace:*",
+    "@arena/plugin-headless-grid": "workspace:*",
+    "@arena/plugin-native-evaluators": "workspace:*",
+    "@arena/plugin-scripted-agent": "workspace:*",
+    "@arena/plugin-agent-rumble": "workspace:*",
+    "@arena/plugin-personacraft": "workspace:*",
+    "@arena/plugin-physical-ai": "workspace:*",
+    "@arena/plugin-openrouter-agent": "workspace:*"
+  }
+}

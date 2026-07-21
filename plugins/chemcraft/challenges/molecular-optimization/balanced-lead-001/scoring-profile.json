@@ -1,0 +1,20 @@
+{
+  "id": "balanced-graph-v1",
+  "version": "1.0.0",
+  "description": "Hidden deterministic utility over RDKit graph descriptors for candidates satisfying all hard constraints.",
+  "weights": {
+    "similarity": 0.3,
+    "molecularWeight": 0.2,
+    "calculatedLogP": 0.2,
+    "tpsa": 0.15,
+    "fractionSp3": 0.1,
+    "rotatableBondCount": 0.05
+  },
+  "normalization": {
+    "molecularWeight": { "best": 175, "worst": 235, "direction": "minimize" },
+    "calculatedLogP": { "best": 0.5, "worst": 2.5, "direction": "minimize" },
+    "tpsa": { "best": 32, "tolerance": 17, "direction": "target" },
+    "fractionSp3": { "best": 0.5, "worst": 0.1, "direction": "maximize" },
+    "rotatableBondCount": { "best": 1, "worst": 6, "direction": "minimize" }
+  }
+}

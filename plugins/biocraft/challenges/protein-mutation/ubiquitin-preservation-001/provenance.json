@@ -1,0 +1,30 @@
+{
+  "challengeVersion": "1.0.0",
+  "preparedDate": "2026-07-19",
+  "networkRequiredAtRuntime": false,
+  "sources": [
+    {
+      "asset": "reference.fasta and structure.pdb",
+      "database": "RCSB Protein Data Bank",
+      "accession": "1UBQ",
+      "url": "https://www.rcsb.org/structure/1UBQ",
+      "citation": "Vijay-Kumar S, Bugg CE, Cook WJ. Structure of ubiquitin refined at 1.8 A resolution. J Mol Biol. 1987.",
+      "license": "RCSB PDB data usage policy",
+      "downloaded": "2026-07-19",
+      "sha256": "d4a6812d8951cf6594e6a0763f089e35f5a80b62acb3c117b2c5565228a7b161"
+    },
+    {
+      "asset": "homologs.fasta",
+      "database": "UniProtKB",
+      "accessions": ["P0CG63", "Q3E7T8"],
+      "urls": [
+        "https://www.uniprot.org/uniprotkb/P0CG63/entry",
+        "https://www.uniprot.org/uniprotkb/Q3E7T8/entry"
+      ],
+      "license": "Creative Commons Attribution 4.0",
+      "downloaded": "2026-07-19",
+      "preprocessing": "The first 76-residue ubiquitin repeat was extracted; no residues were inferred."
+    }
+  ],
+  "groundTruthDisclosure": "The benchmark ranking is a declared curated computational preservation target. It does not claim experimental validation or a delta-delta-G value."
+}

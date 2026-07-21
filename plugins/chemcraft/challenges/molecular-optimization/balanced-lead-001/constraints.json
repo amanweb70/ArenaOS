@@ -1,0 +1,34 @@
+{
+  "requiredSubstructures": [
+    {
+      "id": "required-aromatic-amide",
+      "smarts": "c[CX3](=O)[NX3]",
+      "description": "Preserve the aromatic amide connection."
+    },
+    {
+      "id": "required-phenyl-ring",
+      "smarts": "c1ccccc1",
+      "description": "Preserve one phenyl aromatic ring."
+    }
+  ],
+  "forbiddenSubstructures": [
+    {
+      "id": "forbidden-halogen",
+      "smarts": "[F,Cl,Br,I]",
+      "description": "No halogen atoms are permitted in this benchmark."
+    }
+  ],
+  "allowedElements": ["C", "H", "N", "O"],
+  "maxFormalChargeMagnitude": 0,
+  "maxFragments": 1,
+  "descriptorRanges": {
+    "molecularWeight": { "max": 235 },
+    "calculatedLogP": { "max": 2.5 },
+    "tpsa": { "min": 15, "max": 45 }
+  },
+  "minimumSimilarityToLead": {
+    "fingerprint": "morgan",
+    "metric": "tanimoto",
+    "threshold": 0.42
+  }
+}

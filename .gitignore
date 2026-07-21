@@ -1,0 +1,16 @@
+node_modules/
+.next/
+.pnpm-store/
+__pycache__/
+*.py[cod]
+services/chemcraft-worker/vendor/
+dist/
+coverage/
+.turbo/
+.arena/
+*.log
+.env
+.env.local
+.env.*.local
+*.tsbuildinfo
+tmp/

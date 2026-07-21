@@ -1,0 +1,28 @@
+{
+  "id": "ubiquitin-preservation-001",
+  "version": "1.0.0",
+  "title": "Ubiquitin Functional Preservation",
+  "family": "protein-mutation",
+  "difficulty": "medium",
+  "objective": "Rank the candidate substitutions by their likelihood of preserving ubiquitin function. Recommend one candidate and support the ranking with conservation, substitution chemistry, structural neighborhood, and curated annotation evidence.",
+  "referenceSequencePath": "reference.fasta",
+  "homologsPath": "homologs.fasta",
+  "structurePath": "structure.pdb",
+  "annotationsPath": "annotations.json",
+  "candidatesPath": "candidates.json",
+  "groundTruthPath": "ground-truth.json",
+  "provenancePath": "provenance.json",
+  "allowedTools": [
+    "biology.inspect_sequence",
+    "biology.align_sequences",
+    "biology.score_substitution",
+    "biology.apply_mutation",
+    "biology.inspect_structure",
+    "biology.inspect_annotations",
+    "biology.write_note",
+    "biology.submit"
+  ],
+  "maxToolCalls": 12,
+  "maxRuntimeMs": 60000,
+  "scoringProfile": "preservation-ranking-v1"
+}

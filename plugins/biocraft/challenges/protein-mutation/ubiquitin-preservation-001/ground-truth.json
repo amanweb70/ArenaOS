@@ -1,0 +1,11 @@
+{
+  "labelType": "curated computational preservation benchmark",
+  "methodology": "Ordering integrates BLOSUM62 compatibility, conservation across the bundled homolog set, and penalties for overlap with documented functional regions. It is not an experimental stability measurement.",
+  "rankedCandidates": ["I13V", "D58E", "I44V", "K48R", "G76A"],
+  "recommendedMutation": "I13V",
+  "criticalAnnotations": {
+    "I44V": "Ile44-centered interaction patch",
+    "K48R": "Lys48 polyubiquitin linkage site",
+    "G76A": "C-terminal diglycine conjugation motif"
+  }
+}

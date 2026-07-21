@@ -1,0 +1,12 @@
+{
+  "name": "@arena/core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": "./src/index.ts",
+  "dependencies": {
+    "@arena/contracts": "workspace:*",
+    "ajv": "^8.17.1"
+  }
+}
+

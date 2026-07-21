@@ -1,0 +1,48 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    environment:
+      ARENA_SERVER_URL: http://api:4000
+    expose:
+      - "3000"
+    depends_on:
+      - api
+    restart: unless-stopped
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    environment:
+      NODE_ENV: production
+      PORT: "4000"
+      ARENA_HOST: 0.0.0.0
+      ARENA_STORAGE_DIRECTORY: /data/runs
+    volumes:
+      - arena-runs:/data/runs
+    expose:
+      - "4000"
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:2-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      ARENA_DOMAIN: ${ARENA_DOMAIN:-localhost}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - web
+      - api
+    restart: unless-stopped
+
+volumes:
+  arena-runs:
+  caddy-data:
+  caddy-config:

@@ -1,0 +1,14 @@
+{
+  "challengeAuthorship": "ArenaOS ChemCraft benchmark, version 1.0.0",
+  "moleculeScope": "Lidocaine reference graph and manually enumerated, chemically sanitized benchmark analogues.",
+  "backend": "RDKit 2025.03.5, installed locally under services/chemcraft-worker/vendor",
+  "scientificLabels": {
+    "graphProperties": "Computed locally by RDKit from bundled SMILES.",
+    "logP": "RDKit Crippen calculated LogP; heuristic, not experimental.",
+    "similarity": "Morgan radius-2 2048-bit fingerprint with Tanimoto metric.",
+    "conformers": "RDKit ETKDGv3 with MMFF94 when parameterized, otherwise UFF.",
+    "groundTruth": "Deterministic utility defined by scoring-profile.json and independently recalculated during evaluation."
+  },
+  "networkAccessAtRuntime": false,
+  "experimentalClaims": false
+}

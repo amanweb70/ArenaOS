@@ -1,0 +1,15 @@
+{
+  "scoringProfile": "balanced-graph-v1",
+  "methodology": "The evaluator independently invokes the local RDKit worker, applies every hard constraint, then computes the declared hidden normalized utility. Invalid candidates receive zero utility.",
+  "ranking": [
+    "candidate-secondary-amide",
+    "candidate-dimethyl",
+    "candidate-ethyl-methyl",
+    "candidate-desmethyl-ring",
+    "candidate-chloro",
+    "candidate-morpholine",
+    "candidate-piperidine",
+    "candidate-pyrrolidine"
+  ],
+  "recommendedMoleculeId": "candidate-secondary-amide"
+}

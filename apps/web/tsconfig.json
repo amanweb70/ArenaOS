@@ -1,0 +1,25 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "preserve",
+    "incremental": true,
+    "noEmit": true,
+    "baseUrl": ".",
+    "plugins": [{ "name": "next" }],
+    "paths": {
+      "@/*": ["./*"],
+      "@arena/contracts": ["../../packages/contracts/src/index.ts"]
+    },
+    "types": ["node"]
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts"
+  ],
+  "exclude": ["node_modules"]
+}

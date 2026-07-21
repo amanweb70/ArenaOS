@@ -1,0 +1,32 @@
+[
+  {
+    "mutation": "I13V",
+    "position": 13,
+    "referenceResidue": "I",
+    "alternateResidue": "V"
+  },
+  {
+    "mutation": "D58E",
+    "position": 58,
+    "referenceResidue": "D",
+    "alternateResidue": "E"
+  },
+  {
+    "mutation": "I44V",
+    "position": 44,
+    "referenceResidue": "I",
+    "alternateResidue": "V"
+  },
+  {
+    "mutation": "K48R",
+    "position": 48,
+    "referenceResidue": "K",
+    "alternateResidue": "R"
+  },
+  {
+    "mutation": "G76A",
+    "position": 76,
+    "referenceResidue": "G",
+    "alternateResidue": "A"
+  }
+]

@@ -1,0 +1,30 @@
+{
+  "id": "balanced-lead-001",
+  "title": "Balanced Local-Anesthetic Lead Optimization",
+  "family": "molecular-optimization",
+  "version": "1.0.0",
+  "difficulty": "medium",
+  "objective": "Rank the bundled lidocaine-inspired analogues. Recommend the candidate that best reduces calculated molecular weight and RDKit LogP while preserving the aromatic amide pharmacophore, remaining sufficiently similar to the lead, and satisfying every hard graph and descriptor constraint.",
+  "scientificScope": "A deterministic graph-descriptor optimization benchmark. It does not estimate clinical efficacy, biological activity, toxicity, experimental solubility, synthesizability, reaction yield, or quantum energy.",
+  "limitations": [
+    "RDKit LogP is a calculated descriptor, not an experimental measurement.",
+    "Fingerprint similarity is structural similarity, not chemical or biological equivalence.",
+    "The supplied objective is a benchmark utility function, not a drug-development recommendation.",
+    "Force-field conformers are model-dependent estimates and are not guaranteed global minima."
+  ],
+  "allowedTools": [
+    "chemistry.inspect_molecule",
+    "chemistry.calculate_descriptors",
+    "chemistry.inspect_functional_groups",
+    "chemistry.calculate_similarity",
+    "chemistry.validate_molecule",
+    "chemistry.generate_conformers",
+    "chemistry.write_note",
+    "chemistry.submit"
+  ],
+  "maxToolCalls": 18,
+  "maxComputeUnits": 36,
+  "maxRuntimeMs": 90000,
+  "scoringProfile": "balanced-graph-v1",
+  "seed": 1701
+}

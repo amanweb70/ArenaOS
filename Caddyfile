@@ -1,0 +1,15 @@
+{$ARENA_DOMAIN:localhost} {
+	encode zstd gzip
+
+	handle /api/* {
+		reverse_proxy api:4000
+	}
+
+	handle /ws/* {
+		reverse_proxy api:4000
+	}
+
+	handle {
+		reverse_proxy web:3000
+	}
+}
